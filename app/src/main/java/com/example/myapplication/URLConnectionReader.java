@@ -13,23 +13,25 @@ import android.os.Handler;
 import android.os.Message;
 
 public class URLConnectionReader extends Thread{
-    private final static String key = "&appid=794fd93fd7e0c10ee376d9e89b082808";
-    private final static String baseURL = "http://api.openweathermap.org/data/2.5/forecast?q=";
-    private final static String lang = "&lang=ru";
+    private final static String key = "d2e19a3a-eb4d-42a3-8e04-b76e7522c141";
+    private final static String baseURL = "https://api.weather.yandex.ru/v1/forecast?limit=7&extra=true&lang=ru_RU";
+    //private final static String lang = "&lang=ru";
 
-    private String city;
-    private String country;
+    private String lat = "&lat=";
+    private String lon = "&lon=";
     private Handler handler;
 
-    URLConnectionReader(Handler handler, String city, String country){
-        this.city = city;
-        this.country = country;
+    private final String X_Yandex_API_Key = "X-Yandex-API-Key";
+
+    URLConnectionReader(Handler handler, String lat, String lon){
+        this.lat += lat;
+        this.lon += lon;
         this.handler = handler;
     }
 
     @Override
     public void run() {
-        ArrayList<Weather> weathers = getWeather(city, country);
+        ArrayList<Weather> weathers = getWeather();
 
         Message message = new Message();
         message.obj = weathers;
@@ -37,12 +39,13 @@ public class URLConnectionReader extends Thread{
         handler.handleMessage(message);
     }
 
-    public ArrayList<Weather> getWeather(String city, String country){
+    private ArrayList<Weather> getWeather(){
         ArrayList<Weather> weathers = new ArrayList<>();
 
         try {
-            URL openWeather = new URL(baseURL + city + "," + country + key + lang);
+            URL openWeather = new URL(baseURL + lat + lon);
             URLConnection urlConnection = openWeather.openConnection();
+            urlConnection.setRequestProperty(X_Yandex_API_Key, key);
             BufferedReader in = new BufferedReader(new InputStreamReader(
                     urlConnection.getInputStream()));
 
@@ -53,20 +56,33 @@ public class URLConnectionReader extends Thread{
             in.close();
 
             JSONObject jsonObject = new JSONObject(jsonLine);
-            JSONArray list = (JSONArray)jsonObject.get("list");
+            JSONArray forecasts = jsonObject.getJSONArray("forecasts");
 
-            for (int i = 0; i < list.length(); i++) {
-                JSONObject item = (JSONObject)list.get(i);
+            for (int day = 0; day < forecasts.length(); day++) {
+                JSONObject jsonWeatherDay = forecasts.getJSONObject(day);
+                JSONObject avgWeatherDay = jsonWeatherDay.getJSONObject("parts")
+                        .getJSONObject("day");
 
-                JSONObject main = (JSONObject)item.get("main");
-                JSONObject clouds = (JSONObject) item.get("clouds");
-                JSONObject wind = (JSONObject) item.get("wind");
+                int temp = avgWeatherDay.getInt("temp_avg");
+                int feels_like = avgWeatherDay.getInt("feels_like");
+                String icon = avgWeatherDay.getString("icon");
+                String  condition = avgWeatherDay.getString("condition");
 
-                weathers.add(new Weather(main.getDouble("temp"), main.getDouble("feels_like"),
-                        main.getDouble("pressure"), main.getDouble("humidity"),
-                        clouds.getDouble("all"), wind.getDouble("speed"),
-                        wind.getDouble("deg")));
+                JSONArray hours = jsonWeatherDay.getJSONArray("hours");
+
+                HourlyWeather[] hourlyWeathers = new HourlyWeather[hours.length()];
+
+                for (int hour = 0; hour < hours.length(); hour++) {
+                    JSONObject jsonHour = hours.getJSONObject(hour);
+
+                    hourlyWeathers[hour] = new HourlyWeather(jsonHour.getInt("temp"),
+                            jsonHour.getString("icon"),
+                            jsonHour.getString("condition"));
+                }
+
+                weathers.add(new Weather(temp, feels_like, icon, condition, hourlyWeathers));
             }
+
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {

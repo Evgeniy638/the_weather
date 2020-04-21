@@ -24,16 +24,12 @@ public class MainActivity extends AppCompatActivity {
         Handler handler = new Handler(){
             @Override
             public void handleMessage(@NonNull Message msg) {
-                final ArrayList<Weather> arrayList = (ArrayList<Weather>) msg.obj;
-
-                for(Weather weather: arrayList){
-                    weathers.add(weather);
-                }
+                weathers.addAll((ArrayList<Weather>)msg.obj);
             }
         };
 
         URLConnectionReader urlConnectionReader = new URLConnectionReader(handler,
-                "Moscow", "ru");
+                "55.75396", "37.620393");
         urlConnectionReader.start();
 
         TextView textView = findViewById(R.id.text123);
