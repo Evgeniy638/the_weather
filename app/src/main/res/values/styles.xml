@@ -1,11 +1,11 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorButtonNormal">@color/colorSecondary</item>
+        <item name="colorError">@color/colorError</item>
+        <item name="android:textColor">@color/textColor1</item>
+        <item name="actionMenuTextColor">@color/textColor1</item>\
     </style>
-
 </resources>

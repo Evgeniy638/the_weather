@@ -12,10 +12,9 @@ import android.icu.util.Measure;
 import android.os.Handler;
 import android.os.Message;
 
-public class URLConnectionReader extends Thread{
+public class URLReaderWeather extends Thread{
     private final static String key = "d2e19a3a-eb4d-42a3-8e04-b76e7522c141";
     private final static String baseURL = "https://api.weather.yandex.ru/v1/forecast?limit=7&extra=true&lang=ru_RU";
-    //private final static String lang = "&lang=ru";
 
     private String lat = "&lat=";
     private String lon = "&lon=";
@@ -23,7 +22,7 @@ public class URLConnectionReader extends Thread{
 
     private final String X_Yandex_API_Key = "X-Yandex-API-Key";
 
-    URLConnectionReader(Handler handler, String lat, String lon){
+    URLReaderWeather(Handler handler, String lat, String lon){
         this.lat += lat;
         this.lon += lon;
         this.handler = handler;
