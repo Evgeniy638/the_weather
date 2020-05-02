@@ -13,17 +13,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class MyWeatherAdapter extends ArrayAdapter<Weather> {
     private ArrayList<Weather> weathers;
     private String[] daysOfWeek = {
+            "Воскресенье",
             "Понедельник",
             "Вторник",
             "Среда",
             "Четверг",
             "Пятница",
-            "Суббота",
-            "Воскресенье"
+            "Суббота"
     };
 
     public MyWeatherAdapter(@NonNull Context context, ArrayList<Weather> weathers) {
@@ -58,8 +59,21 @@ public class MyWeatherAdapter extends ArrayAdapter<Weather> {
                     .inflate(R.layout.adapter_item, null);
         }
 
+        assert weather != null;
+
+        String day;
+
+        if(position == 0){
+            day = "Сегодня";
+        }else if (position == 1){
+            day = "Завтра";
+        }else {
+            int indexDay = (new Date(weather.date)).getDay();
+            day = daysOfWeek[indexDay];
+        }
+
         ((TextView) convertView.findViewById(R.id.adapter_item_day_of_week))
-                .setText(daysOfWeek[position] + ":");
+                .setText(day + ":");
         ((TextView) convertView.findViewById(R.id.adapter_item_temperature))
                 .setText(weather.temp + "°C");
         Utils.fetchSvg(getContext(), weather.icon,

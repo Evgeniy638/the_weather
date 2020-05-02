@@ -65,6 +65,7 @@ public class URLReaderWeather extends Thread{
                 int feels_like = avgWeatherDay.getInt("feels_like");
                 String icon = avgWeatherDay.getString("icon");
                 String  condition = avgWeatherDay.getString("condition");
+                long date = jsonWeatherDay.getLong("date_ts") * 1000;
 
                 JSONArray hours = jsonWeatherDay.getJSONArray("hours");
 
@@ -78,7 +79,7 @@ public class URLReaderWeather extends Thread{
                             jsonHour.getString("condition"));
                 }
 
-                weathers.add(new Weather(temp, feels_like, icon, condition, hourlyWeathers));
+                weathers.add(new Weather(temp, feels_like, icon, condition, hourlyWeathers, date));
             }
 
         } catch (MalformedURLException e) {
