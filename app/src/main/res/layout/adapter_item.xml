@@ -1,33 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="My Button"
-    android:layout_marginBottom="@dimen/activity_vertical_padding"
-    android:paddingLeft="@dimen/activity_horizontal_padding"
-    android:paddingRight="@dimen/activity_horizontal_padding"
-    android:paddingBottom="@dimen/activity_vertical_padding"
-    android:paddingTop="@dimen/activity_vertical_padding"
-    android:background="@drawable/ripple">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="wrap_content" android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:background="@color/backgroundColor">
 
-    <TextView
-        android:id="@+id/adapter_item_day_of_week"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:orientation="horizontal" android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textSize="20dp"
-        android:textColor="@color/textColor1"/>
+        android:paddingLeft="@dimen/activity_horizontal_padding"
+        android:paddingRight="@dimen/activity_horizontal_padding"
+        android:paddingBottom="@dimen/activity_vertical_padding"
+        android:paddingTop="@dimen/activity_vertical_padding"
+        android:layout_marginTop="@dimen/activity_vertical_padding"
+        android:layout_marginRight="@dimen/activity_short_horizontal_padding"
+        android:layout_marginLeft="@dimen/activity_short_horizontal_padding"
+        android:elevation="@dimen/elevation_first_level"
+        android:background="@drawable/ripple"
+        tools:targetApi="lollipop">
 
-    <ImageView
-        android:id="@+id/adapter_item_icon"
-        android:layout_width="25dp"
-        android:layout_height="25dp"/>
+        <TextView
+            android:id="@+id/adapter_item_day_of_week"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="20dp"
+            android:textColor="@color/textColor1"/>
 
-    <TextView
-        android:id="@+id/adapter_item_temperature"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="20dp"
-        android:textColor="@color/textColor1"/>
+        <ImageView
+            android:id="@+id/adapter_item_icon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"/>
+
+        <TextView
+            android:id="@+id/adapter_item_temperature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:textColor="@color/textColor1"/>
+
+    </LinearLayout>
+
+    <View android:layout_width="match_parent"
+        android:layout_height="@dimen/activity_vertical_padding"
+        android:background="@color/backgroundColor"/>
 
 </LinearLayout>

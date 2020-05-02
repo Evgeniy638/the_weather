@@ -54,8 +54,4 @@ public class MainActivity extends AppCompatActivity {
                 "55.75396", "37.620393");
         urlReaderWeather.start();
     }
-
-    private void getDataAboutWeather(){
-
-    }
 }

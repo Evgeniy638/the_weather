@@ -2,7 +2,6 @@ package com.example.myapplication;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,12 +12,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.io.IOException;
 import java.util.ArrayList;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Response;
 
 public class MyWeatherAdapter extends ArrayAdapter<Weather> {
     private ArrayList<Weather> weathers;
@@ -68,15 +62,9 @@ public class MyWeatherAdapter extends ArrayAdapter<Weather> {
                 .setText(daysOfWeek[position] + ":");
         ((TextView) convertView.findViewById(R.id.adapter_item_temperature))
                 .setText(weather.temp + "°C");
+        Utils.fetchSvg(getContext(), weather.icon,
+                (ImageView) convertView.findViewById(R.id.adapter_item_icon));
 
-        final View finalConvertView = convertView;
-        HttpHelper.getIconWeather(weather.icon, new CallbackBitmap() {
-            @Override
-            public void setBitmap(Bitmap bitmap) {
-                ((ImageView) finalConvertView.findViewById(R.id.adapter_item_icon))
-                        .setImageBitmap(bitmap);
-            }
-        });
         return convertView;
     }
 }
