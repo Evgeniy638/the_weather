@@ -76,7 +76,8 @@ public class URLReaderWeather extends Thread{
 
                     hourlyWeathers[hour] = new HourlyWeather(jsonHour.getInt("temp"),
                             jsonHour.getString("icon"),
-                            jsonHour.getString("condition"));
+                            jsonHour.getString("condition"),
+                            jsonHour.getLong("hour_ts"));
                 }
 
                 weathers.add(new Weather(temp, feels_like, icon, condition, hourlyWeathers, date));

@@ -6,6 +6,7 @@
     android:background="@color/backgroundColor">
 
     <LinearLayout
+        android:id="@+id/adapter_toggle_additional_information"
         android:orientation="horizontal" android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="@dimen/activity_horizontal_padding"
@@ -24,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:textSize="20dp"
+            android:textSize="@dimen/text_size"
             android:textColor="@color/textColor1"/>
 
         <ImageView
@@ -36,13 +37,40 @@
             android:id="@+id/adapter_item_temperature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="20dp"
+            android:textSize="@dimen/text_size"
             android:textColor="@color/textColor1"/>
 
     </LinearLayout>
 
-    <View android:layout_width="match_parent"
+    <LinearLayout
+        android:id="@+id/adapter_additional_information"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/colorSecondary"
+        android:layout_marginLeft="@dimen/activity_short_horizontal_padding"
+        android:layout_marginRight="@dimen/activity_short_horizontal_padding"
+        android:elevation="@dimen/elevation_first_level"
+        tools:targetApi="lollipop">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size"/>
+
+        <com.jjoe64.graphview.GraphView
+            android:layout_width="match_parent"
+            android:layout_height="200dip"
+            android:id="@+id/graph" />
+
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/space_view"
+        android:layout_width="match_parent"
         android:layout_height="@dimen/activity_vertical_padding"
         android:background="@color/backgroundColor"/>
+
+
 
 </LinearLayout>

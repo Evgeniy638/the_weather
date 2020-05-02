@@ -30,5 +30,7 @@ dependencies {
     implementation 'com.pixplicity.sharp:library:1.1.0'
     //библиотека для запросов в интернет
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+    //графики
+    implementation 'com.jjoe64:graphview:4.2.2'
 
 }
