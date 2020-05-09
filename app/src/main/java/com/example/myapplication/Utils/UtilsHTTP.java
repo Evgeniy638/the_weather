@@ -1,7 +1,6 @@
-package com.example.myapplication;
+package com.example.myapplication.Utils;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.widget.ImageView;
 
 import com.pixplicity.sharp.Sharp;
@@ -16,7 +15,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class Utils {
+public class UtilsHTTP {
     private static final String url = "https://yastatic.net/weather/i/icons/blueye/color/svg/";
     private static OkHttpClient httpClient;
 

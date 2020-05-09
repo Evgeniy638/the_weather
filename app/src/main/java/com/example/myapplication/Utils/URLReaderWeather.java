@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.example.myapplication.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -10,6 +10,9 @@ import java.util.ArrayList;
 
 import android.os.Handler;
 import android.os.Message;
+
+import com.example.myapplication.Data.HourlyWeather;
+import com.example.myapplication.Data.Weather;
 
 public class URLReaderWeather extends Thread{
     private final static String key = "d2e19a3a-eb4d-42a3-8e04-b76e7522c141";

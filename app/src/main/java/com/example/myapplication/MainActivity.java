@@ -10,6 +10,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.widget.ListView;
 
+import com.example.myapplication.Data.Weather;
+import com.example.myapplication.Utils.URLReaderWeather;
+
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -40,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         try {
-                            MyWeatherAdapter myWeatherAdapter = new MyWeatherAdapter(getApplicationContext(), weathers);
+                            MyWeatherAdapter myWeatherAdapter = new MyWeatherAdapter(MainActivity.this, weathers);
                             listView.setAdapter(myWeatherAdapter);
                         }catch (Exception e){
                             e.printStackTrace();
