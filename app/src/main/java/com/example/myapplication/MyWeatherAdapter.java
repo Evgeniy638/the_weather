@@ -87,7 +87,8 @@ public class MyWeatherAdapter extends ArrayAdapter<Weather> {
                 (ImageView) convertView.findViewById(R.id.adapter_item_icon));
 
         //строю график
-        UtilsView.drawGraph((GraphView) convertView.findViewById(R.id.graph), weather, getContext(), day);
+        UtilsView.drawGraph((GraphView) convertView.findViewById(R.id.graph),
+                weather, getContext(), day);
 
         //////показ или сокрытие дополнительных данных//////
         final View finalConvertView = convertView;

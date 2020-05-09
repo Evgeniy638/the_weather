@@ -46,7 +46,7 @@
         android:id="@+id/adapter_additional_information"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@color/colorSecondary"
+        android:background="@drawable/additional_list_item_information"
         android:layout_marginLeft="@dimen/activity_short_horizontal_padding"
         android:layout_marginRight="@dimen/activity_short_horizontal_padding"
         android:elevation="@dimen/elevation_first_level"

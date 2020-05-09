@@ -29,15 +29,35 @@ public class UtilsView {
         mapDaysOfWeek.put("Завтра", "Завтра");
     }
 
+    private static String[] partsDayName = new String[Weather.LENGTH_PART_DAY];
+    private static HashMap<String, String[]> mapPartDay = new HashMap<>();
+    static {
+        mapPartDay.put("night", new String[]{"ночь", "ночью"});
+        mapPartDay.put("morning", new String[]{"утро", "утром"});
+        mapPartDay.put("day", new String[]{"день", "днем"});
+        mapPartDay.put("evening", new String[]{"вечер", "вечером"});
+    }
+
     public static void drawGraph(GraphView graph, Weather weather, final Context context, String day)
     {
         if(!graph.getSeries().isEmpty())
             return;
 
-        DataPoint[] dataPoint = new DataPoint[weather.hourlyWeather.length];
+        final boolean isHour = weather.hourlyWeather.length == 24;
 
-        for (int i = 0; i < weather.hourlyWeather.length; i ++) {
-            dataPoint[i] = new DataPoint(i, weather.hourlyWeather[i].temp);
+        DataPoint[] dataPoint = new DataPoint[isHour
+                ?weather.hourlyWeather.length
+                :weather.parts.length];
+
+        for (int i = 0; i < dataPoint.length; i ++) {
+            dataPoint[i] = new DataPoint(i,
+                    isHour
+                    ?weather.hourlyWeather[i].temp
+                    :weather.parts[i].temp);
+
+            if(!isHour){
+                partsDayName[i] = weather.parts[i].name;
+            }
         }
 
         LineGraphSeries<DataPoint> series = new LineGraphSeries<>(dataPoint);
@@ -58,8 +78,12 @@ public class UtilsView {
         series.setOnDataPointTapListener(new OnDataPointTapListener() {
             @Override
             public void onTap(Series series, DataPointInterface dataPoint) {
+                String str = isHour
+                        ?" в "+ toTimeFormat(dataPoint.getX())
+                        :" " + mapPartDay.get(partsDayName[(int)dataPoint.getX()])[1];
+
                 Toast.makeText(context,
-                        mapDaysOfWeek.get(finalDay) + " в "+ toTimeFormat(dataPoint.getX()) +
+                        mapDaysOfWeek.get(finalDay) + str +
                                 " температура будет равна " +
                                 toDegreeFormat(dataPoint.getY()),
                         Toast.LENGTH_LONG).show();
@@ -80,8 +104,8 @@ public class UtilsView {
 
         //для оси OY
         graph.getViewport().setXAxisBoundsManual(true);
-        graph.getViewport().setMaxX(23);
-        graph.getGridLabelRenderer().setNumHorizontalLabels(5);
+        graph.getViewport().setMaxX(dataPoint.length - 1);
+        graph.getGridLabelRenderer().setNumHorizontalLabels(isHour ?5 :Weather.LENGTH_PART_DAY);
 
 
 
@@ -90,12 +114,22 @@ public class UtilsView {
             @Override
             public String formatLabel(double value, boolean isValueX) {
                 if (isValueX) {
-                    return toTimeFormat(Double.parseDouble(super.formatLabel(value, isValueX)));
+                    return isHour
+                            ?toTimeFormat(Double.parseDouble(super.formatLabel(value, isValueX)))
+                            :toPartDayFormat(super.formatLabel(value, isValueX));
                 }else {
                     return toDegreeFormat(Double.parseDouble(super.formatLabel(value, isValueX)));
                 }
             }
         });
+    }
+
+    private static String toPartDayFormat(String string){
+        int data = (int)Math.round(Double.parseDouble(string));
+
+        String result = mapPartDay.get(partsDayName[data])[0];
+
+        return result;
     }
 
     private static String toTimeFormat(Double data){

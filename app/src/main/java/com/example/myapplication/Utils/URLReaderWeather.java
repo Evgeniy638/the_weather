@@ -7,11 +7,14 @@ import org.json.JSONObject;
 import java.net.*;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 
 import android.os.Handler;
 import android.os.Message;
 
 import com.example.myapplication.Data.HourlyWeather;
+import com.example.myapplication.Data.PartDay;
 import com.example.myapplication.Data.Weather;
 
 public class URLReaderWeather extends Thread{
@@ -24,7 +27,15 @@ public class URLReaderWeather extends Thread{
 
     private final String X_Yandex_API_Key = "X-Yandex-API-Key";
 
-    URLReaderWeather(Handler handler, String lat, String lon){
+    private static HashSet<String> setPartDay = new HashSet<>();
+    {
+        setPartDay.add("night");
+        setPartDay.add("morning");
+        setPartDay.add("day");
+        setPartDay.add("evening");
+    }
+
+    public URLReaderWeather(Handler handler, String lat, String lon){
         this.lat += lat;
         this.lon += lon;
         this.handler = handler;
@@ -70,6 +81,7 @@ public class URLReaderWeather extends Thread{
                 String  condition = avgWeatherDay.getString("condition");
                 long date = jsonWeatherDay.getLong("date_ts") * 1000;
 
+                //считываю данные дня по чассам
                 JSONArray hours = jsonWeatherDay.getJSONArray("hours");
 
                 HourlyWeather[] hourlyWeathers = new HourlyWeather[hours.length()];
@@ -83,7 +95,32 @@ public class URLReaderWeather extends Thread{
                             jsonHour.getLong("hour_ts"));
                 }
 
-                weathers.add(new Weather(temp, feels_like, icon, condition, hourlyWeathers, date));
+                //считываю данные частей дня
+                JSONObject parts = jsonWeatherDay.getJSONObject("parts");
+                Iterator<String> keys = parts.keys();
+
+                PartDay[] partsDay = new PartDay[Weather.LENGTH_PART_DAY];
+
+                int j = 0; // индекс partsDay
+                while (keys.hasNext()){
+                    String key = keys.next();
+
+                    if(!setPartDay.contains(key)) continue;
+
+                    if (parts.get(key) instanceof JSONObject){
+                        JSONObject jsonPart = parts.getJSONObject(key);
+
+                        partsDay[j] = new PartDay(key,
+                                jsonPart .getInt("temp_avg"),
+                                jsonPart.getString("icon"),
+                                jsonPart.getString("condition"));
+
+                        j++;
+                    }
+                }
+
+                weathers.add(new Weather(temp, feels_like, icon, condition,
+                        hourlyWeathers, date, partsDay));
             }
 
         } catch (MalformedURLException e) {

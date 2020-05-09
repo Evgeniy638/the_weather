@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_padding"
     android:orientation="vertical"
     android:gravity="center_horizontal"
     android:background="@color/backgroundColor"
@@ -23,7 +22,6 @@
         android:layout_height="match_parent"
         android:layout_marginLeft="@dimen/activity_horizontal_padding"
         android:layout_marginRight="@dimen/activity_horizontal_padding"
-        android:layout_marginBottom="@dimen/activity_vertical_padding"
         android:divider="@android:color/transparent"/>
 
     <FrameLayout

@@ -9,22 +9,27 @@ public class Weather  implements Parcelable {
     public final String icon;
     public final String condition;
     public final HourlyWeather[] hourlyWeather;
+    public final PartDay[] parts;
     public final long date;
 
+    public static final int LENGTH_PART_DAY = 4;
+
     public Weather(int temp, int feels_like, String icon, String condition,
-                   HourlyWeather[] hourlyWeather, long date) {
+                   HourlyWeather[] hourlyWeather, long date, PartDay[] parts) {
         this.temp = temp;
         this.feels_like = feels_like;
         this.icon = icon;
         this.condition = condition;
         this.hourlyWeather = hourlyWeather;
         this.date = date;
+        this.parts = parts;
     }
 
     public Weather(Parcel in){
-        int hourlyWeatherLength = in.readInt();
+        int hourlyWeatherLength = in.readInt(); // считываю размер массива hourlyWeather
+        int partsLength = in.readInt(); // считываю размер массива parts
 
-        String[] data = new String[hourlyWeatherLength + 5];
+        String[] data = new String[partsLength + hourlyWeatherLength + 5];
         in.readStringArray(data);
 
         this.temp = Integer.parseInt(data[0]);
@@ -37,10 +42,26 @@ public class Weather  implements Parcelable {
         for (int i = 0; i < hourlyWeatherLength; i++) {
             this.hourlyWeather[i] = new HourlyWeather(data[i + 5]);
         }
+
+        this.parts = new PartDay[partsLength];
+        for (int i = 0; i < partsLength; i++) {
+            this.parts[i] = new PartDay(data[i + 5 + hourlyWeatherLength]);
+        }
     }
 
     public int getMinTemperature(){
-        if(hourlyWeather.length == 0) return 0;
+        if(hourlyWeather.length != 24){
+            if (parts.length == 0) return 0;
+
+            int min = parts[0].temp;
+
+            for (int i = 1; i < parts.length; i++) {
+                if(min > parts[i].temp)
+                    min = parts[i].temp;
+            }
+
+            return min;
+        }
         int min = hourlyWeather[0].temp;
 
         for (int i = 1; i < hourlyWeather.length; i++) {
@@ -52,7 +73,18 @@ public class Weather  implements Parcelable {
     }
 
     public int getMaxTemperature(){
-        if(hourlyWeather.length == 0) return 1;
+        if(hourlyWeather.length != 24) {
+            if (parts.length == 0) return 1;
+
+            int max = parts[0].temp;
+
+            for (int i = 1; i < parts.length; i++) {
+                if(max < parts[i].temp)
+                    max = parts[i].temp;
+            }
+
+            return max;
+        }
 
         int max = hourlyWeather[0].temp;
 
@@ -71,7 +103,7 @@ public class Weather  implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        String[] data = new String[5 + hourlyWeather.length];
+        String[] data = new String[5 + hourlyWeather.length + parts.length];
         data[0] = Integer.toString(temp);
         data[1] = Integer.toString(feels_like);
         data[2] = icon;
@@ -82,7 +114,12 @@ public class Weather  implements Parcelable {
             data[i + 5] = hourlyWeather[i].toString();
         }
 
+        for (int i = 0; i < parts.length; i++) {
+            data[i + 5 + hourlyWeather.length] = parts[i].toString();
+        }
+
         dest.writeInt(hourlyWeather.length);
+        dest.writeInt(parts.length);
         dest.writeStringArray(data);
     }
 
