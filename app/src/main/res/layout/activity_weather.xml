@@ -10,11 +10,50 @@
         android:layout_height="wrap_content"
         android:textSize="@dimen/text_size"/>
 
-    <com.jjoe64.graphview.GraphView
+    <com.example.myapplication.CustomGraphView
         android:elevation="@dimen/elevation_first_level"
         android:background="@color/colorSecondary"
         android:layout_width="match_parent"
         android:layout_height="400dip"
         android:id="@+id/activity_weather_graph"
         tools:targetApi="lollipop" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/activity_weather_button_temp"
+            android:layout_width="wrap_content"
+            android:layout_marginLeft="@dimen/activity_short_horizontal_padding"
+            android:background="@drawable/ripple"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/temperature"
+            android:layout_marginStart="@dimen/activity_short_horizontal_padding"
+            android:layout_marginTop="@dimen/activity_short_vertical_padding"
+            android:layout_marginBottom="@dimen/activity_short_vertical_padding"/>
+        <Button
+            android:id="@+id/activity_weather_button_humidity"
+            android:background="@drawable/ripple"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/humidity"
+            android:layout_marginRight="@dimen/activity_short_horizontal_padding"
+            android:layout_marginLeft="@dimen/activity_short_horizontal_padding"
+            android:layout_marginTop="@dimen/activity_short_vertical_padding"
+            android:layout_marginBottom="@dimen/activity_short_vertical_padding"/>
+        <Button
+            android:id="@+id/activity_weather_button_pressure_mm"
+            android:background="@drawable/ripple"
+            android:layout_marginRight="@dimen/activity_short_horizontal_padding"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/pressure"
+            android:layout_marginEnd="@dimen/activity_short_horizontal_padding"
+            android:layout_marginTop="@dimen/activity_short_vertical_padding"
+            android:layout_marginBottom="@dimen/activity_short_vertical_padding" />
+    </LinearLayout>
 </LinearLayout>

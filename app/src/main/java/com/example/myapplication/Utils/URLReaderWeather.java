@@ -89,7 +89,10 @@ public class URLReaderWeather extends Thread{
                 for (int hour = 0; hour < hours.length(); hour++) {
                     JSONObject jsonHour = hours.getJSONObject(hour);
 
-                    hourlyWeathers[hour] = new HourlyWeather(jsonHour.getInt("temp"),
+                    hourlyWeathers[hour] = new HourlyWeather(
+                            jsonHour.getInt("pressure_mm"),
+                            jsonHour.getInt("humidity"),
+                            jsonHour.getInt("temp"),
                             jsonHour.getString("icon"),
                             jsonHour.getString("condition"),
                             jsonHour.getLong("hour_ts"));
@@ -110,7 +113,8 @@ public class URLReaderWeather extends Thread{
                     if (parts.get(key) instanceof JSONObject){
                         JSONObject jsonPart = parts.getJSONObject(key);
 
-                        partsDay[j] = new PartDay(key,
+                        partsDay[j] = new PartDay(jsonPart.getInt("pressure_mm"),
+                                jsonPart.getInt("humidity"), key,
                                 jsonPart .getInt("temp_avg"),
                                 jsonPart.getString("icon"),
                                 jsonPart.getString("condition"));

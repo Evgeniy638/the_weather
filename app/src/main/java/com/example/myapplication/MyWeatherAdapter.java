@@ -17,13 +17,13 @@ import androidx.annotation.Nullable;
 import com.example.myapplication.Data.Weather;
 import com.example.myapplication.Utils.UtilsHTTP;
 import com.example.myapplication.Utils.UtilsView;
-import com.jjoe64.graphview.GraphView;
 
 import java.util.ArrayList;
 import java.util.Date;
 
 public class MyWeatherAdapter extends ArrayAdapter<Weather> {
     private ArrayList<Weather> weathers;
+    private static ArrayList<String> modes = new ArrayList<>();
     private String[] daysOfWeek = {
             "Воскресенье",
             "Понедельник",
@@ -38,6 +38,10 @@ public class MyWeatherAdapter extends ArrayAdapter<Weather> {
     public MyWeatherAdapter(@NonNull Context context, ArrayList<Weather> weathers) {
         super(context, R.layout.adapter_item);
         this.weathers = weathers;
+
+        for (int i = 0; i < weathers.size(); i++) {
+            modes.add(UtilsView.MODE_TEMPERATURE);
+        }
     }
 
     @Override
@@ -59,13 +63,15 @@ public class MyWeatherAdapter extends ArrayAdapter<Weather> {
     @SuppressLint("SetTextI18n")
     @NonNull
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+    public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         final Weather weather = getItem(position);
 
         if (convertView == null){
             convertView = LayoutInflater.from(getContext())
                     .inflate(R.layout.adapter_item, null);
         }
+
+        final View finalConvertView = convertView;
 
         //заполняю данные
         assert weather != null;
@@ -87,11 +93,49 @@ public class MyWeatherAdapter extends ArrayAdapter<Weather> {
                 (ImageView) convertView.findViewById(R.id.adapter_item_icon));
 
         //строю график
-        UtilsView.drawGraph((GraphView) convertView.findViewById(R.id.graph),
+        UtilsView.drawGraph(modes.get(position),
+                (CustomGraphView) convertView.findViewById(R.id.graph),
                 weather, getContext(), day);
 
+        //////кнопки смены режима данных графика//////
+
+        //меняем на температуру
+        convertView.findViewById(R.id.adapter_button_temp)
+                .setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                modes.set(position, UtilsView.MODE_TEMPERATURE);
+                UtilsView.drawGraph(modes.get(position),
+                        (CustomGraphView) finalConvertView.findViewById(R.id.graph),
+                        weather, getContext(), day);
+            }
+        });
+
+        //меняем на влажность
+        convertView.findViewById(R.id.adapter_button_humidity)
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        modes.set(position, UtilsView.MODE_HUMIDITY);
+                        UtilsView.drawGraph(modes.get(position),
+                                (CustomGraphView) finalConvertView.findViewById(R.id.graph),
+                                weather, getContext(), day);
+                    }
+                });
+
+        //меняем на давление
+        convertView.findViewById(R.id.adapter_button_pressure_mm)
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        modes.set(position, UtilsView.MODE_PRESSURE);
+                        UtilsView.drawGraph(modes.get(position),
+                                (CustomGraphView) finalConvertView.findViewById(R.id.graph),
+                                weather, getContext(), day);
+                    }
+                });
+
         //////показ или сокрытие дополнительных данных//////
-        final View finalConvertView = convertView;
         LinearLayout toggle = convertView.findViewById(R.id.adapter_toggle_additional_information);
 
         //открытие скрытого окна
@@ -130,6 +174,7 @@ public class MyWeatherAdapter extends ArrayAdapter<Weather> {
                 Intent intent = new Intent(getContext(), WeatherActivity.class);
                 intent.putExtra("weather", weather);
                 intent.putExtra("day", day);
+                intent.putExtra("position", position);
                 getContext().startActivity(intent);
 
                 return false;
@@ -137,5 +182,21 @@ public class MyWeatherAdapter extends ArrayAdapter<Weather> {
         });
 
         return convertView;
+    }
+
+
+
+    public static void setModes(int position, String mode){
+        if(position < 0 || position >= modes.size())
+            return;
+
+        modes.set(position, mode);
+    }
+
+    public static String getMode(int position){
+        if(position < 0 || position >= modes.size())
+            return "";
+
+        return modes.get(position);
     }
 }

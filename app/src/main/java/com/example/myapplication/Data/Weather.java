@@ -96,6 +96,100 @@ public class Weather  implements Parcelable {
         return max;
     }
 
+    public int getMinPressure(){
+        if(hourlyWeather.length != 24){
+            if (parts.length == 0) return 0;
+
+            int min = parts[0].pressure_mm;
+
+            for (int i = 1; i < parts.length; i++) {
+                if(min > parts[i].pressure_mm)
+                    min = parts[i].pressure_mm;
+            }
+
+            return min;
+        }
+        int min = hourlyWeather[0].pressure_mm;
+
+        for (int i = 1; i < hourlyWeather.length; i++) {
+            if(min > hourlyWeather[i].pressure_mm)
+                min = hourlyWeather[i].pressure_mm;
+        }
+
+        return min;
+    }
+
+    public int getMaxPressure(){
+        if(hourlyWeather.length != 24) {
+            if (parts.length == 0) return 1;
+
+            int max = parts[0].pressure_mm;
+
+            for (int i = 1; i < parts.length; i++) {
+                if(max < parts[i].pressure_mm)
+                    max = parts[i].pressure_mm;
+            }
+
+            return max;
+        }
+
+        int max = hourlyWeather[0].pressure_mm;
+
+        for (int i = 1; i < hourlyWeather.length; i++) {
+            if(max < hourlyWeather[i].pressure_mm)
+                max = hourlyWeather[i].pressure_mm;
+        }
+
+        return max;
+    }
+
+    public int getMinHumidity(){
+        if(hourlyWeather.length != 24){
+            if (parts.length == 0) return 0;
+
+            int min = parts[0].humidity;
+
+            for (int i = 1; i < parts.length; i++) {
+                if(min > parts[i].humidity)
+                    min = parts[i].humidity;
+            }
+
+            return min;
+        }
+        int min = hourlyWeather[0].humidity;
+
+        for (int i = 1; i < hourlyWeather.length; i++) {
+            if(min > hourlyWeather[i].humidity)
+                min = hourlyWeather[i].humidity;
+        }
+
+        return min;
+    }
+
+    public int getMaxHumidity(){
+        if(hourlyWeather.length != 24) {
+            if (parts.length == 0) return 1;
+
+            int max = parts[0].humidity;
+
+            for (int i = 1; i < parts.length; i++) {
+                if(max < parts[i].humidity)
+                    max = parts[i].humidity;
+            }
+
+            return max;
+        }
+
+        int max = hourlyWeather[0].humidity;
+
+        for (int i = 1; i < hourlyWeather.length; i++) {
+            if(max < hourlyWeather[i].humidity)
+                max = hourlyWeather[i].humidity;
+        }
+
+        return max;
+    }
+
     @Override
     public int describeContents() {
         return 0;

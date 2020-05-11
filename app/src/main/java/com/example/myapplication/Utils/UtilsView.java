@@ -4,9 +4,9 @@ import android.content.Context;
 import android.graphics.Color;
 import android.widget.Toast;
 
+import com.example.myapplication.CustomGraphView;
 import com.example.myapplication.Data.Weather;
 import com.jjoe64.graphview.DefaultLabelFormatter;
-import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.DataPointInterface;
 import com.jjoe64.graphview.series.LineGraphSeries;
@@ -16,6 +16,12 @@ import com.jjoe64.graphview.series.Series;
 import java.util.HashMap;
 
 public class UtilsView {
+    private static final int MAX_Y_VALUE = 8;
+
+    public static final String MODE_TEMPERATURE = "MODE_TEMPERATURE";
+    public static final String MODE_HUMIDITY = "MODE_HUMIDITY";
+    public static final String MODE_PRESSURE = "MODE_PRESSURE";
+
     private static HashMap<String, String> mapDaysOfWeek = new HashMap<>();
     static {
         mapDaysOfWeek.put("Воскресенье", "В воскресенье");
@@ -38,10 +44,13 @@ public class UtilsView {
         mapPartDay.put("evening", new String[]{"вечер", "вечером"});
     }
 
-    public static void drawGraph(GraphView graph, Weather weather, final Context context, String day)
+    public static void drawGraph(final String mode, CustomGraphView graph, Weather weather,
+                                 final Context context, String day)
     {
-        if(!graph.getSeries().isEmpty())
+        if (!checkMode(mode))
             return;
+
+        graph.init();
 
         final boolean isHour = weather.hourlyWeather.length == 24;
 
@@ -52,8 +61,8 @@ public class UtilsView {
         for (int i = 0; i < dataPoint.length; i ++) {
             dataPoint[i] = new DataPoint(i,
                     isHour
-                    ?weather.hourlyWeather[i].temp
-                    :weather.parts[i].temp);
+                    ?getHourlyWeatherByMode(mode, weather, i)
+                    :getPartsByMode(mode, weather, i));
 
             if(!isHour){
                 partsDayName[i] = weather.parts[i].name;
@@ -71,21 +80,29 @@ public class UtilsView {
         series.setDrawDataPoints(true);
         series.setDataPointsRadius(10);
 
-        //меняю название графика
-        series.setTitle("Температура");
-
+        //показ сообения при нажатии на точку
         final String finalDay = day;
         series.setOnDataPointTapListener(new OnDataPointTapListener() {
             @Override
             public void onTap(Series series, DataPointInterface dataPoint) {
+                String typeInf = "";
+
+                if(mode.equals(UtilsView.MODE_PRESSURE)){
+                    typeInf = "давление будет равно";
+                } else if (mode.equals(UtilsView.MODE_HUMIDITY)){
+                    typeInf = "влажность будет равна";
+                } else if (mode.equals(UtilsView.MODE_TEMPERATURE)){
+                    typeInf = "температура будет равна";
+                }
+
                 String str = isHour
                         ?" в "+ toTimeFormat(dataPoint.getX())
                         :" " + mapPartDay.get(partsDayName[(int)dataPoint.getX()])[1];
 
                 Toast.makeText(context,
                         mapDaysOfWeek.get(finalDay) + str +
-                                " температура будет равна " +
-                                toDegreeFormat(dataPoint.getY()),
+                                " " + typeInf + " " +
+                                toFormatByMode(dataPoint.getY(), mode),
                         Toast.LENGTH_LONG).show();
             }
         });
@@ -96,18 +113,17 @@ public class UtilsView {
         graph.getGridLabelRenderer().setHumanRounding(false);
 
         //для оси OY
+        int max = getMaxData(mode, weather);
+        int min = getMinData(mode, weather);
+        graph.getGridLabelRenderer().setNumVerticalLabels(Math.min(max - min + 1, MAX_Y_VALUE));
+        graph.getViewport().setMaxY(max);
+        graph.getViewport().setMinY(min);
         graph.getViewport().setYAxisBoundsManual(true);
-        graph.getViewport().setMaxY(weather.getMaxTemperature());
-        graph.getViewport().setMinY(weather.getMinTemperature());
-        graph.getGridLabelRenderer().setNumVerticalLabels(Math.min(weather.getMaxTemperature() -
-                weather.getMinTemperature() + 1, 8));
 
-        //для оси OY
-        graph.getViewport().setXAxisBoundsManual(true);
-        graph.getViewport().setMaxX(dataPoint.length - 1);
+        //для оси OX
         graph.getGridLabelRenderer().setNumHorizontalLabels(isHour ?5 :Weather.LENGTH_PART_DAY);
-
-
+        graph.getViewport().setMaxX(dataPoint.length - 1);
+        graph.getViewport().setXAxisBoundsManual(true);
 
         //////изменяю формат значений осей//////
         graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter() {
@@ -118,10 +134,55 @@ public class UtilsView {
                             ?toTimeFormat(Double.parseDouble(super.formatLabel(value, isValueX)))
                             :toPartDayFormat(super.formatLabel(value, isValueX));
                 }else {
-                    return toDegreeFormat(Double.parseDouble(super.formatLabel(value, isValueX)));
+                    return toFormatByMode(super.formatLabel(value, isValueX), mode);
                 }
             }
         });
+    }
+
+    private static int getMinData(String mode, Weather weather) {
+        if (mode.equals(MODE_TEMPERATURE)){
+            return weather.getMinTemperature();
+        }else if (mode.equals(MODE_HUMIDITY)){
+            return weather.getMinHumidity();
+        }else {
+            return weather.getMinPressure();
+        }
+    }
+
+    private static int getMaxData(String mode, Weather weather) {
+        if (mode.equals(MODE_TEMPERATURE)){
+            return weather.getMaxTemperature();
+        }else if (mode.equals(MODE_HUMIDITY)){
+            return weather.getMaxHumidity();
+        }else {
+            return weather.getMaxPressure();
+        }
+    }
+
+    private static boolean checkMode(String mode){
+        return mode.equals(MODE_TEMPERATURE) || mode.equals(MODE_HUMIDITY)
+                || mode.equals(MODE_PRESSURE);
+    }
+
+    private static int getHourlyWeatherByMode(String mode, Weather weather, int index){
+        if (mode.equals(MODE_TEMPERATURE)){
+            return weather.hourlyWeather[index].temp;
+        }else if (mode.equals(MODE_HUMIDITY)){
+            return weather.hourlyWeather[index].humidity;
+        }else {
+            return weather.hourlyWeather[index].pressure_mm;
+        }
+    }
+
+    private static int getPartsByMode(String mode, Weather weather, int index){
+        if (mode.equals(MODE_TEMPERATURE)){
+            return weather.parts[index].temp;
+        }else if (mode.equals(MODE_HUMIDITY)){
+            return weather.parts[index].humidity;
+        }else {
+            return weather.parts[index].pressure_mm;
+        }
     }
 
     private static String toPartDayFormat(String string){
@@ -147,7 +208,33 @@ public class UtilsView {
         return toDegreeFormat(Integer.toString((int)Math.round(data)));
     }
 
-    private static String toDegreeFormat(String string){
-        return string + "°C";
+    private static String toFormatByMode(Double data, String mode){
+        return toFormatByMode(Double.toString(data), mode);
+    }
+
+    private static String toFormatByMode(String data, String mode){
+        data = Integer.toString((int)Math.round(Double.parseDouble(data)));
+
+        if (mode.equals(UtilsView.MODE_TEMPERATURE)){
+            return toDegreeFormat(data);
+        }else if(mode.equals(UtilsView.MODE_HUMIDITY)){
+            return toHumadityFormat(data);
+        }else if(mode.equals(UtilsView.MODE_PRESSURE)){
+            return toPressureFormat(data);
+        }else {
+            return data;
+        }
+    }
+
+    private static String toDegreeFormat(String data){
+        return data + "°C";
+    }
+
+    private static String toHumadityFormat(String data){
+        return data + "%";
+    }
+
+    private static String toPressureFormat(String data){
+        return data + " мм рт.ст.";
     }
 }

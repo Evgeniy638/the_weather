@@ -16,6 +16,8 @@ import com.example.myapplication.Utils.URLReaderWeather;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+    private static MyWeatherAdapter myWeatherAdapter;
+
     public final ArrayList<Weather> weathers = new ArrayList<>();
 
     private ListView listView;
@@ -43,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         try {
-                            MyWeatherAdapter myWeatherAdapter = new MyWeatherAdapter(MainActivity.this, weathers);
+                            myWeatherAdapter = new MyWeatherAdapter(MainActivity.this, weathers);
                             listView.setAdapter(myWeatherAdapter);
                         }catch (Exception e){
                             e.printStackTrace();
@@ -56,5 +58,9 @@ public class MainActivity extends AppCompatActivity {
         URLReaderWeather urlReaderWeather = new URLReaderWeather(handler,
                 "55.75396", "37.620393");
         urlReaderWeather.start();
+    }
+
+    public static MyWeatherAdapter getMyWeatherAdapter(){
+        return myWeatherAdapter;
     }
 }
