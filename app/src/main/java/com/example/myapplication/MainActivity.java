@@ -27,11 +27,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitleTextColor(getResources().getColor(R.color.textColor1));
-        if(toolbar != null){
-            setSupportActionBar(toolbar);
-        }
+//        Toolbar toolbar = findViewById(R.id.toolbar);
+//        if(toolbar != null){
+//            toolbar.setTitleTextColor(getResources().getColor(R.color.textColor2));
+//            setSupportActionBar(toolbar);
+//        }
 
         listView = findViewById(R.id.listView);
 

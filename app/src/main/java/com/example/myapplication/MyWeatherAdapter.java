@@ -24,6 +24,10 @@ import java.util.Date;
 public class MyWeatherAdapter extends ArrayAdapter<Weather> {
     private ArrayList<Weather> weathers;
     private static ArrayList<String> modes = new ArrayList<>();
+    private static ArrayList<Boolean> openWindows = new ArrayList<>();
+
+    private static boolean isInit = false;
+
     private String[] daysOfWeek = {
             "Воскресенье",
             "Понедельник",
@@ -39,8 +43,16 @@ public class MyWeatherAdapter extends ArrayAdapter<Weather> {
         super(context, R.layout.adapter_item);
         this.weathers = weathers;
 
-        for (int i = 0; i < weathers.size(); i++) {
-            modes.add(UtilsView.MODE_TEMPERATURE);
+        if(!isInit) {
+            isInit = true;
+
+            for (int i = 0; i < weathers.size(); i++) {
+                modes.add(UtilsView.MODE_TEMPERATURE);
+            }
+
+            for (int i = 0; i < weathers.size(); i++) {
+                openWindows.add(false);
+            }
         }
     }
 
@@ -97,6 +109,9 @@ public class MyWeatherAdapter extends ArrayAdapter<Weather> {
                 (CustomGraphView) convertView.findViewById(R.id.graph),
                 weather, getContext(), day);
 
+        //открываю или закрываю окно в зависимости от openWindows
+        toggleHiddenWindow(finalConvertView, position);
+
         //////кнопки смены режима данных графика//////
 
         //меняем на температуру
@@ -143,27 +158,8 @@ public class MyWeatherAdapter extends ArrayAdapter<Weather> {
                     @SuppressLint("NewApi")
                     @Override
                     public void onClick(View v) {
-                        LinearLayout toggleAdditionalInformation = finalConvertView
-                                .findViewById(R.id.adapter_toggle_additional_information);
-
-                        LinearLayout additionalInformation = finalConvertView
-                                .findViewById(R.id.adapter_additional_information);
-
-                        ViewGroup.LayoutParams informationParams = additionalInformation
-                                .getLayoutParams();
-
-                        if (additionalInformation.getHeight() == 0){
-                            toggleAdditionalInformation.setBackground(getContext().getResources()
-                                            .getDrawable(R.drawable.riple_with_top_radius));
-
-                            informationParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-                        } else {
-                            toggleAdditionalInformation.setBackground(getContext().getResources()
-                                    .getDrawable(R.drawable.ripple));
-                            informationParams.height = 0;
-                        }
-
-                        additionalInformation.setLayoutParams(informationParams);
+                        openWindows.set(position, !openWindows.get(position));
+                        toggleHiddenWindow(finalConvertView, position);
                     }
                 });
 
@@ -184,7 +180,30 @@ public class MyWeatherAdapter extends ArrayAdapter<Weather> {
         return convertView;
     }
 
+    @SuppressLint("NewApi")
+    private void toggleHiddenWindow(@Nullable final View finalConvertView, int position){
+        LinearLayout toggleAdditionalInformation = finalConvertView
+                .findViewById(R.id.adapter_toggle_additional_information);
 
+        LinearLayout additionalInformation = finalConvertView
+                .findViewById(R.id.adapter_additional_information);
+
+        ViewGroup.LayoutParams informationParams = additionalInformation
+                .getLayoutParams();
+
+        if (openWindows.get(position)){
+            toggleAdditionalInformation.setBackground(getContext().getResources()
+                    .getDrawable(R.drawable.riple_with_top_radius));
+
+            informationParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        } else {
+            toggleAdditionalInformation.setBackground(getContext().getResources()
+                    .getDrawable(R.drawable.ripple));
+            informationParams.height = 0;
+        }
+
+        additionalInformation.setLayoutParams(informationParams);
+    }
 
     public static void setModes(int position, String mode){
         if(position < 0 || position >= modes.size())

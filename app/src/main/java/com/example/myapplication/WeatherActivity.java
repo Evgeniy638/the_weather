@@ -6,9 +6,12 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.example.myapplication.Data.Weather;
 import com.example.myapplication.Utils.UtilsView;
+
+import java.util.Objects;
 
 public class WeatherActivity extends AppCompatActivity {
     private Weather weather;
@@ -21,6 +24,16 @@ public class WeatherActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
         context = this;
+
+//        Toolbar toolbar = findViewById(R.id.toolbar);
+//        if(toolbar != null){
+//            toolbar.setTitleTextColor(getResources().getColor(R.color.textColor2));
+//            setSupportActionBar(toolbar);
+//        }
+
+        if(getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         weather = getIntent().getParcelableExtra("weather");
         day = getIntent().getStringExtra("day");
