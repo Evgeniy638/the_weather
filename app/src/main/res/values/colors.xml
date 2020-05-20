@@ -8,4 +8,5 @@
     <color name="backgroundColor">#ECECEC</color>
     <color name="textColor1">#000</color>
     <color name="textColor2">#FFF</color>
+    <color name="textColor3">#9C9C9C</color>
 </resources>

@@ -16,7 +16,7 @@ import com.jjoe64.graphview.series.Series;
 import java.util.HashMap;
 
 public class UtilsView {
-    private static final int MAX_Y_VALUE = 8;
+    private static final int MAX_Y_DIFFERENCE = 8;
 
     public static final String MODE_TEMPERATURE = "MODE_TEMPERATURE";
     public static final String MODE_HUMIDITY = "MODE_HUMIDITY";
@@ -115,8 +115,8 @@ public class UtilsView {
         //для оси OY
         int max = getMaxData(mode, weather);
         int min = getMinData(mode, weather);
-        graph.getGridLabelRenderer().setNumVerticalLabels(Math.min(max - min + 1, MAX_Y_VALUE));
-        graph.getViewport().setMaxY(max);
+        graph.getGridLabelRenderer().setNumVerticalLabels(MAX_Y_DIFFERENCE + 1);
+        graph.getViewport().setMaxY(Math.max(max, min + MAX_Y_DIFFERENCE));
         graph.getViewport().setMinY(min);
         graph.getViewport().setYAxisBoundsManual(true);
 
@@ -124,6 +124,13 @@ public class UtilsView {
         graph.getGridLabelRenderer().setNumHorizontalLabels(isHour ?5 :Weather.LENGTH_PART_DAY);
         graph.getViewport().setMaxX(dataPoint.length - 1);
         graph.getViewport().setXAxisBoundsManual(true);
+
+        //лучше удалить
+        //разрешаю прокрутку и увелечение
+        graph.getViewport().setScrollable(true);
+        graph.getViewport().setScrollableY(true);
+        graph.getViewport().setScalable(true);
+        graph.getViewport().setScalableY(true);
 
         //////изменяю формат значений осей//////
         graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter() {

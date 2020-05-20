@@ -14,10 +14,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.myapplication.Data.AuxiliaryData;
 import com.example.myapplication.Data.Weather;
 import com.example.myapplication.Utils.UtilsHTTP;
 import com.example.myapplication.Utils.UtilsView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -85,24 +87,39 @@ public class MyWeatherAdapter extends ArrayAdapter<Weather> {
 
         final View finalConvertView = convertView;
 
-        //заполняю данные
+        /////заполняю данные/////
         assert weather != null;
 
+        Date date = new Date(weather.date);
+
+        //выбераю день
         if(position == 0){
             day = "Сегодня";
         }else if (position == 1){
             day = "Завтра";
         }else {
-            int indexDay = (new Date(weather.date)).getDay();
+            int indexDay = date.getDay();
             day = daysOfWeek[indexDay];
         }
 
+        //настраиваю вывод даты
+        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd MMMM",
+                AuxiliaryData.getDateFormatSymbols());
+
+        //заполняем данные текстовых элементов и картинок
         ((TextView) convertView.findViewById(R.id.adapter_item_day_of_week))
-                .setText(day + ":");
-        ((TextView) convertView.findViewById(R.id.adapter_item_temperature))
-                .setText(weather.temp + "°C");
+                .setText(day);
+        ((TextView) convertView.findViewById(R.id.adapter_item_date))
+                .setText(simpleDateFormat.format(date));
+        ((TextView) convertView.findViewById(R.id.adapter_item_day_temperature))
+                .setText((weather.parts[2].temp > 0 ?"+" :"") + weather.parts[2].temp + "°C");
+        ((TextView) convertView.findViewById(R.id.adapter_item_night_temperature))
+                .setText((weather.parts[0].temp > 0 ?"+" :"") + weather.parts[0].temp + "°C");
         UtilsHTTP.fetchSvg(getContext(), weather.icon,
                 (ImageView) convertView.findViewById(R.id.adapter_item_icon));
+        ((TextView) convertView.findViewById(R.id.adapter_item_condition))
+                .setText(AuxiliaryData.getMapConditions(weather.condition));
 
         //строю график
         UtilsView.drawGraph(modes.get(position),
