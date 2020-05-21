@@ -39,7 +39,6 @@ public class MyWeatherAdapter extends ArrayAdapter<Weather> {
             "Пятница",
             "Суббота"
     };
-    private String day;
 
     public MyWeatherAdapter(@NonNull Context context, ArrayList<Weather> weathers) {
         super(context, R.layout.adapter_item);
@@ -79,6 +78,7 @@ public class MyWeatherAdapter extends ArrayAdapter<Weather> {
     @Override
     public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         final Weather weather = getItem(position);
+        final String day;
 
         if (convertView == null){
             convertView = LayoutInflater.from(getContext())

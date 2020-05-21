@@ -2,9 +2,15 @@ package com.example.myapplication;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -16,27 +22,28 @@ import com.example.myapplication.Utils.URLReaderWeather;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+    private int REQUEST_CODE_LOCATION = 1;
+    private LocationManager locationManager;
+
+    private Handler handler;
+
     private static MyWeatherAdapter myWeatherAdapter;
-
-    public final ArrayList<Weather> weathers = new ArrayList<>();
-
+    public static final ArrayList<Weather> weathers = new ArrayList<>();
     private ListView listView;
 
+    private static boolean isInit = false;
+
+    @SuppressLint("HandlerLeak")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        Toolbar toolbar = findViewById(R.id.toolbar);
-//        if(toolbar != null){
-//            toolbar.setTitleTextColor(getResources().getColor(R.color.textColor2));
-//            setSupportActionBar(toolbar);
-//        }
-
         listView = findViewById(R.id.listView);
 
-        @SuppressLint("HandlerLeak")
-        Handler handler = new Handler(){
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+        handler = new Handler(){
             @Override
             public void handleMessage(@NonNull Message msg) {
                 weathers.addAll((ArrayList<Weather>)msg.obj);
@@ -45,8 +52,13 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         try {
-                            myWeatherAdapter = new MyWeatherAdapter(MainActivity.this, weathers);
+                            if (myWeatherAdapter == null) {
+                                myWeatherAdapter = new MyWeatherAdapter(MainActivity.this, weathers);
+                            }
+
                             listView.setAdapter(myWeatherAdapter);
+
+                            locationManager.removeUpdates(locationListener);
                         }catch (Exception e){
                             e.printStackTrace();
                         }
@@ -55,12 +67,69 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        URLReaderWeather urlReaderWeather = new URLReaderWeather(handler,
-                "55.75396", "37.620393");
-        urlReaderWeather.start();
+        if(!hasAccessFineLocation()){
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_CODE_LOCATION);
+        }else if (!isInit){
+            requestLocationUpdates();
+        }
+
+        if(isInit) {
+            listView.setAdapter(myWeatherAdapter);
+        }
+
+        isInit = true;
     }
 
     public static MyWeatherAdapter getMyWeatherAdapter(){
         return myWeatherAdapter;
     }
+
+    private boolean hasAccessFineLocation(){
+        return hasPermission(Manifest.permission.ACCESS_FINE_LOCATION);
+    }
+
+    private boolean hasPermission(String perm){
+        return PackageManager.PERMISSION_GRANTED ==
+                ContextCompat.checkSelfPermission(this, perm);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if(requestCode == REQUEST_CODE_LOCATION && hasAccessFineLocation())
+            requestLocationUpdates();
+        else if (requestCode == REQUEST_CODE_LOCATION)
+            finish();
+    }
+
+    @SuppressLint("MissingPermission")
+    private void requestLocationUpdates(){
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                0, 1000, locationListener);
+    }
+
+    private LocationListener locationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+            URLReaderWeather urlReaderWeather = new URLReaderWeather(handler,
+                    Double.toString(location.getLatitude()), Double.toString(location.getLongitude()));
+            urlReaderWeather.start();
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+    };
 }

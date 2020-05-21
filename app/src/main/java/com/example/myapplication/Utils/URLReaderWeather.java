@@ -35,6 +35,10 @@ public class URLReaderWeather extends Thread{
         setPartDay.add("evening");
     }
 
+    public URLReaderWeather(Handler handler){
+        this(handler, "55.75396", "37.620393");
+    }
+
     public URLReaderWeather(Handler handler, String lat, String lon){
         this.lat += lat;
         this.lon += lon;
