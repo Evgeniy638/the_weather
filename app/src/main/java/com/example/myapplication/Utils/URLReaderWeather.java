@@ -13,7 +13,7 @@ import java.util.Iterator;
 import android.os.Handler;
 import android.os.Message;
 
-import com.example.myapplication.ApiKey;
+import com.example.myapplication.Data.ApiKey;
 import com.example.myapplication.Data.HourlyWeather;
 import com.example.myapplication.Data.PartDay;
 import com.example.myapplication.Data.Weather;
