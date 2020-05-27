@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="activity_horizontal_padding">10dp</dimen>
+    <dimen name="activity_short_horizontal_padding">5dp</dimen>
+    <dimen name="activity_vertical_padding">10dp</dimen>
+    <dimen name="activity_big_vertical_padding">30dp</dimen>
+    <dimen name="activity_short_vertical_padding">5dp</dimen>
+    <dimen name="elevation_first_level">5dp</dimen>
+    <dimen name="elevation_second_level">10dp</dimen>
+    <dimen name="elevation_three_level">15dp</dimen>
+    <dimen name="toolbar_min_height">50dp</dimen>
+    <dimen name="text_size">18sp</dimen>
+    <dimen name="text_size_small">16sp</dimen>
+    <dimen name="radius1">10dp</dimen>
+    <dimen name="radius2">30dp</dimen>
+</resources>

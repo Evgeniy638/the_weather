@@ -26,4 +26,11 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    //библиотека для чтения svg, огромное спасибо https://muetsch.io/how-to-load-svg-into-imageview-by-url-in-android.html
+    implementation 'com.pixplicity.sharp:library:1.1.0'
+    //библиотека для запросов в интернет
+    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+    //графики
+    implementation 'com.jjoe64:graphview:4.2.2'
+
 }
