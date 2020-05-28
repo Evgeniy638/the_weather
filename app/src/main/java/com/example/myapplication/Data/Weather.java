@@ -1,7 +1,13 @@
 package com.example.myapplication.Data;
 
+import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 public class Weather  implements Parcelable {
     public final int temp;
@@ -13,6 +19,10 @@ public class Weather  implements Parcelable {
     public final long date;
 
     public static final int LENGTH_PART_DAY = 4;
+
+    private final String delimiter = ";";
+    private final String delimiterArray = "@";
+    private static final String delimiterAdapter = "%";
 
     public Weather(int temp, int feels_like, String icon, String condition,
                    HourlyWeather[] hourlyWeather, long date, PartDay[] parts) {
@@ -47,6 +57,85 @@ public class Weather  implements Parcelable {
         for (int i = 0; i < partsLength; i++) {
             this.parts[i] = new PartDay(data[i + 5 + hourlyWeatherLength]);
         }
+    }
+
+    public Weather(String str){
+        String[] data = str.split(delimiter);
+
+        String[] hourlyWeatherString = data[5].split(delimiterArray);
+        String[] partsString = data[6].split(delimiterArray);
+
+        int hourlyWeatherLength = hourlyWeatherString.length; // считываю размер массива hourlyWeather
+        int partsLength = partsString.length; // считываю размер массива parts
+
+        this.temp = Integer.parseInt(data[0]);
+        this.feels_like = Integer.parseInt(data[1]);
+        this.icon = data[2];
+        this.condition = data[3];
+        this.date = Long.parseLong(data[4]);
+
+        if(!hourlyWeatherString[0].equals("")) {
+            this.hourlyWeather = new HourlyWeather[hourlyWeatherLength];
+            for (int i = 0; i < hourlyWeatherLength; i++) {
+                this.hourlyWeather[i] = new HourlyWeather(hourlyWeatherString[i]);
+            }
+        }else {
+            this.hourlyWeather = new HourlyWeather[0];
+        }
+
+        this.parts = new PartDay[partsLength];
+        for (int i = 0; i < partsLength; i++) {
+            this.parts[i] = new PartDay(partsString[i]);
+        }
+    }
+
+    @SuppressLint("NewApi")
+    public static String toStringIntoArrayList(ArrayList<Weather> weathers){
+        String[] strings = new String[weathers.size()];
+
+        for (int i = 0; i < strings.length; i++) {
+            strings[i] = weathers.get(i).toString();
+        }
+
+        return String.join(delimiterAdapter, strings);
+    }
+
+    @SuppressLint("NewApi")
+    public static ArrayList<Weather> intoStringToArrayList(String string){
+        ArrayList<Weather> weathers = new ArrayList<>();
+        String[] stringsWeather = string.split(delimiterAdapter);
+
+        for (int i = 0; i < stringsWeather.length; i++) {
+            weathers.add( new Weather(stringsWeather[i]));
+        }
+
+        return weathers;
+    }
+
+    @SuppressLint("NewApi")
+    @NonNull
+    @Override
+    public String toString() {
+        String[] hourlyWeatherString = new String[hourlyWeather.length];
+        String[] partsString = new String[parts.length];
+
+        for (int i = 0; i < hourlyWeather.length; i++) {
+            hourlyWeatherString[i] = hourlyWeather[i].toString();
+        }
+
+        for (int i = 0; i < parts.length; i++) {
+            partsString[i] = parts[i].toString();
+        }
+
+        return String.join(delimiter, new String[]{
+                Integer.toString(temp),
+                Integer.toString(feels_like),
+                icon,
+                condition,
+                Long.toString(date),
+                String.join(delimiterArray, hourlyWeatherString),
+                String.join(delimiterArray, partsString)
+        });
     }
 
     public int getMinTemperature(){

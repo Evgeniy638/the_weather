@@ -1,8 +1,11 @@
 package com.example.myapplication.Data;
 
 import android.annotation.SuppressLint;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
+
+import java.io.Console;
 
 public class HourlyWeather {
     public final int pressure_mm;
@@ -14,7 +17,7 @@ public class HourlyWeather {
 
     //с помощью нее я разделяю данные в массиве при конвертации массива полей класса в строку
     //так же использую ее в обратной операции
-    private final String delimiter = ";";
+    private final String delimiter = "&";
 
     public HourlyWeather(int pressure_mm, int humidity,
                          int temp, String icon, String condition, long hour_ts) {

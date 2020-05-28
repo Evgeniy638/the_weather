@@ -7,6 +7,8 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -19,6 +21,7 @@ import android.widget.ListView;
 import com.example.myapplication.Data.Weather;
 import com.example.myapplication.Utils.URLReaderWeather;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -33,6 +36,11 @@ public class MainActivity extends AppCompatActivity {
 
     private static boolean isInit = false;
 
+    public static final String APP_PREFERENCES = "data_weathers";
+    public static final String APP_PREFERENCES_NAME = "weathers";
+
+    private SharedPreferences sharedPreferences;
+
     @SuppressLint("HandlerLeak")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
 
         listView = findViewById(R.id.listView);
 
+        //получаю SharedPreferences, где хранятся кешированные данные
+        sharedPreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         handler = new Handler(){
@@ -48,17 +59,15 @@ public class MainActivity extends AppCompatActivity {
             public void handleMessage(@NonNull Message msg) {
                 weathers.addAll((ArrayList<Weather>)msg.obj);
 
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString(APP_PREFERENCES_NAME, Weather.toStringIntoArrayList(weathers));
+                editor.apply();
+
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         try {
-                            if (myWeatherAdapter == null) {
-                                myWeatherAdapter = new MyWeatherAdapter(MainActivity.this, weathers);
-                            }
-
-                            listView.setAdapter(myWeatherAdapter);
-
-                            locationManager.removeUpdates(locationListener);
+                            startAdapter();
                         }catch (Exception e){
                             e.printStackTrace();
                         }
@@ -67,10 +76,15 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        if(!hasAccessFineLocation()){
+        if(isInit && !hasAccessFineLocation() && isOnline()){
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     REQUEST_CODE_LOCATION);
+        }else if(!isInit && (!isOnline() || !hasAccessFineLocation())) {
+            weathers.addAll(Weather.intoStringToArrayList(
+                    sharedPreferences.getString(APP_PREFERENCES_NAME, "")));
+
+            startAdapter();
         }else if (!isInit){
             requestLocationUpdates();
         }
@@ -80,6 +94,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
         isInit = true;
+    }
+
+    private void startAdapter(){
+        if (myWeatherAdapter == null) {
+            myWeatherAdapter = new MyWeatherAdapter(MainActivity.this, weathers);
+        }
+
+        listView.setAdapter(myWeatherAdapter);
+
+        locationManager.removeUpdates(locationListener);
     }
 
     public static MyWeatherAdapter getMyWeatherAdapter(){
@@ -129,7 +153,23 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onProviderDisabled(String provider) {
+            weathers.addAll(Weather.intoStringToArrayList(
+                    sharedPreferences.getString(APP_PREFERENCES_NAME, "")));
 
+            startAdapter();
         }
     };
+
+    public boolean isOnline() {
+        Runtime runtime = Runtime.getRuntime();
+        try {
+            Process ipProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
+            int     exitValue = ipProcess.waitFor();
+            return (exitValue == 0);
+        }
+        catch (IOException e)          { e.printStackTrace(); }
+        catch (InterruptedException e) { e.printStackTrace(); }
+
+        return false;
+    }
 }

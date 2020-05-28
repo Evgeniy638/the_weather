@@ -14,7 +14,7 @@ public class PartDay {
 
     //с помощью нее я разделяю данные в массиве при конвертации массива полей класса в строку
     //так же использую ее в обратной операции
-    private final String delimiter = ";";
+    private final String delimiter = "#";
 
     public PartDay(int pressure_mm, int humidity,
                    String name, int temp, String icon, String condition) {
